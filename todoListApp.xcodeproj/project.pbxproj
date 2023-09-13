@@ -24,6 +24,7 @@
 		FF6BD7E92AB0A84D0046502E /* ProfilePageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6BD7E62AB0A84C0046502E /* ProfilePageViewModel.swift */; };
 		FF6BD7EA2AB0A84D0046502E /* ProfileDesignViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6BD7E72AB0A84D0046502E /* ProfileDesignViewModel.swift */; };
 		FF6BD7EB2AB0A84D0046502E /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6BD7E82AB0A84D0046502E /* ViewModel.swift */; };
+		FF6BD8002AB1603D0046502E /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FF6BD7FE2AB1603D0046502E /* Model.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 		FF6BD7E62AB0A84C0046502E /* ProfilePageViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfilePageViewModel.swift; sourceTree = "<group>"; };
 		FF6BD7E72AB0A84D0046502E /* ProfileDesignViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileDesignViewModel.swift; sourceTree = "<group>"; };
 		FF6BD7E82AB0A84D0046502E /* ViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
+		FF6BD7FF2AB1603D0046502E /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				FF3CD44B2A9C2D140028A568 /* TaskManager.swift */,
+				FF6BD7FE2AB1603D0046502E /* Model.xcdatamodeld */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -211,6 +214,7 @@
 				FF23F6992A7943C100D65879 /* MainViewController.swift in Sources */,
 				FF23F6A92A794AB000D65879 /* TodoPageViewController.swift in Sources */,
 				FF23F6AD2A79597800D65879 /* DonePage.swift in Sources */,
+				FF6BD8002AB1603D0046502E /* Model.xcdatamodeld in Sources */,
 				FF23F6AF2A795BFA00D65879 /* DoneCell.swift in Sources */,
 				FF6BD7E92AB0A84D0046502E /* ProfilePageViewModel.swift in Sources */,
 				FF23F6AB2A794BFE00D65879 /* TodoCell.swift in Sources */,
@@ -461,6 +465,19 @@
 			productName = SnapKit;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		FF6BD7FE2AB1603D0046502E /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				FF6BD7FF2AB1603D0046502E /* Model.xcdatamodel */,
+			);
+			currentVersion = FF6BD7FF2AB1603D0046502E /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = FF23F6892A7943C100D65879 /* Project object */;
 }

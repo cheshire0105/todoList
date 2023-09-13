@@ -6,97 +6,127 @@
 //
 
 import Foundation
+import CoreData
 
 class TaskManager {
-    
     static let shared = TaskManager()
     
-    private let tasksKey = "tasks"
-    private let completedTasksKey = "completedTasks"
+    lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "Model")
+        container.loadPersistentStores(completionHandler: { (_, error) in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        return container
+    }()
     
-    private init() {}
-    
-    // MARK: - 해야 할 일
-    func saveTask(task: String, inSection section: Int) {
-        var tasks = UserDefaults.standard.array(forKey: tasksKey) as? [[String]] ?? [[String](), [String]()]
-        
-        // 배열의 크기를 검사하고 필요한 경우 적절한 크기로 확장합니다.
-        while tasks.count <= section {
-            tasks.append([String]())
-        }
-        
-        tasks[section].append(task)
-        UserDefaults.standard.set(tasks, forKey: tasksKey)
+    var context: NSManagedObjectContext {
+        return persistentContainer.viewContext
     }
     
-    func loadTasks() -> [[String]] {
-        return UserDefaults.standard.array(forKey: tasksKey) as? [[String]] ?? [[String](), [String]()]
+    // Create
+    func saveTask(taskTitle: String, isCompleted: Bool, categoryName: String) {
+        let todo = Todo(context: context)
+        todo.title = taskTitle
+        todo.isCompleted = isCompleted
+        
+        // Find or create a category with the given name
+        let categoryFetchRequest: NSFetchRequest<Category> = Category.fetchRequest()
+        categoryFetchRequest.predicate = NSPredicate(format: "name == %@", categoryName)
+        
+        do {
+            let categories = try context.fetch(categoryFetchRequest)
+            if let category = categories.first {
+                // Category with the given name already exists
+                todo.category = category
+            } else {
+                // Create a new category with the given name
+                let newCategory = Category(context: context)
+                newCategory.name = categoryName
+                todo.category = newCategory
+            }
+            
+            saveContext()
+        } catch {
+            print("Error fetching categories: \(error)")
+        }
     }
     
-    func modifyTask(at index: Int, inSection section: Int, newTask: String) {
-        var tasks = UserDefaults.standard.array(forKey: tasksKey) as? [[String]] ?? [[String](), [String]()]
+    // Read
+    func loadTasks() -> [[Todo]] {
+        var tasks = [[Todo](), [Todo]()]
+        let fetchRequest: NSFetchRequest<Todo> = Todo.fetchRequest()
         
-        // 섹션 및 인덱스가 유효한 범위 내에 있는지 확인합니다.
-        guard section < tasks.count, index < tasks[section].count else {
-            return
-        }
-        
-        tasks[section][index] = newTask
-        UserDefaults.standard.set(tasks, forKey: tasksKey)
-    }
-
-    
-    func deleteTask(at index: Int, inSection section: Int) {
-        var tasks = UserDefaults.standard.array(forKey: tasksKey) as? [[String]] ?? [[String](), [String]()]
-        
-        // 섹션 및 인덱스가 유효한 범위 내에 있는지 확인합니다.
-        guard section < tasks.count, index < tasks[section].count else {
-            return
-        }
-        
-        tasks[section].remove(at: index)
-        UserDefaults.standard.set(tasks, forKey: tasksKey)
-    }
-    
-    // MARK: - 완료 한 일
-    func saveCompletedTask(task: String, inSection section: Int) {
-        var completedTasks = UserDefaults.standard.array(forKey: completedTasksKey) as? [[String]] ?? [[String](), [String]()]
-        
-        // 배열의 크기를 검사하고 필요한 경우 적절한 크기로 확장합니다.
-        while completedTasks.count <= section {
-            completedTasks.append([String]())
-        }
-        
-        completedTasks[section].append(task)
-        UserDefaults.standard.set(completedTasks, forKey: completedTasksKey)
-    }
-
-    
-    func loadCompletedTasks() -> [[String]] {
-        let defaultTasks = [[String](), [String]()]
-        guard let loadedTasks = UserDefaults.standard.array(forKey: completedTasksKey) as? [[String]] else {
-            return defaultTasks
-        }
-        
-        // 섹션의 크기를 검사하고 필요한 경우 적절한 크기로 확장합니다.
-        var tasks = loadedTasks
-        while tasks.count < defaultTasks.count {
-            tasks.append([String]())
+        do {
+            let allTasks = try context.fetch(fetchRequest)
+            for task in allTasks {
+                if let section = task.category?.name == "오전" ? 0 : 1 {
+                    tasks[section].append(task)
+                }
+            }
+        } catch {
+            print("Error fetching tasks: \(error)")
         }
         
         return tasks
     }
     
-    func deleteCompletedTask(at index: Int, inSection section: Int) {
-        var completedTasks = UserDefaults.standard.array(forKey: completedTasksKey) as? [[String]] ?? [[String](), [String]()]
+    // Update
+    func modifyTask(at indexPath: IndexPath, newTaskTitle: String, isCompleted: Bool) {
+        let tasks = loadTasks()
+        let task = tasks[indexPath.section][indexPath.row]
+        task.title = newTaskTitle
+        task.isCompleted = isCompleted
+        saveContext()
+    }
+    
+    // Delete
+    func deleteTask(task: Todo) {
+        context.delete(task)
+        saveContext()
+    }
+    
+    func saveContext() {
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                print("Error saving context: \(error)")
+            }
+        }
+    }
+    
+    // Load completed tasks
+    func loadCompletedTasks() -> [[Todo]] {
+        var completedTasks = [[Todo](), [Todo]()]
+        let fetchRequest: NSFetchRequest<Todo> = Todo.fetchRequest()
         
-        // 섹션 및 인덱스가 유효한 범위 내에 있는지 확인합니다.
-        guard section < completedTasks.count, index < completedTasks[section].count else {
-            return
+        do {
+            let allTasks = try context.fetch(fetchRequest)
+            for task in allTasks {
+                if task.isCompleted {
+                    let section = task.category?.name == "오전" ? 0 : 1
+                    completedTasks[section].append(task)
+                }
+            }
+        } catch {
+            print("Error fetching completed tasks: \(error)")
         }
         
-        completedTasks[section].remove(at: index)
-        UserDefaults.standard.set(completedTasks, forKey: completedTasksKey)
+        return completedTasks
     }
-}
 
+    // Revert a completed task to the task list
+    func revertTaskToTodoList(task: Todo) {
+        task.isCompleted = false
+        saveContext()
+    }
+
+    // Delete a completed task
+    func deleteCompletedTask(task: Todo) {
+        context.delete(task)
+        saveContext()
+    }
+
+}

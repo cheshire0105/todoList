@@ -1,8 +1,9 @@
 import UIKit
+import CoreData
 
 class DonePage: UIViewController {
     // 완료된 작업을 2차원 배열로 변경. 첫 번째 배열은 오전, 두 번째 배열은 오후입니다.
-    var completedTasks = [[String](), [String]()]
+    var completedTasks = [[Todo](), [Todo]()]
     
     @IBOutlet weak var doneTableView: UITableView!
     
@@ -38,7 +39,7 @@ extension DonePage: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // 다운 캐스팅 해서 레이블에 표시
         let cell = tableView.dequeueReusableCell(withIdentifier: "DoneCell", for: indexPath) as! DoneCell
-        cell.doneLabel.text = completedTasks[indexPath.section][indexPath.row]
+        cell.doneLabel.text = completedTasks[indexPath.section][indexPath.row].title // 변경: .title 속성을 사용하여 문자열 얻기
         return cell
     }
 }
@@ -54,13 +55,12 @@ extension DonePage: UITableViewDelegate {
             let taskToRevert = self.completedTasks[indexPath.section][indexPath.row]
             self.completedTasks[indexPath.section].remove(at: indexPath.row)
             
-            TaskManager.shared.deleteCompletedTask(at: indexPath.row, inSection: indexPath.section)
-            
-            TaskManager.shared.saveTask(task: taskToRevert, inSection: indexPath.section)
-
+            // 이 부분을 수정하여 task 인자를 제대로 전달하도록 합니다.
+            TaskManager.shared.saveTask(taskTitle: taskToRevert.title!, isCompleted: false, categoryName: indexPath.section == 0 ? "오전" : "오후")
             
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
+
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         
@@ -73,12 +73,17 @@ extension DonePage: UITableViewDelegate {
     }
     
     // 밀어서 삭제
+    // 밀어서 삭제
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
+            let taskToDelete = completedTasks[indexPath.section][indexPath.row]
             completedTasks[indexPath.section].remove(at: indexPath.row)
-            TaskManager.shared.deleteCompletedTask(at: indexPath.row, inSection: indexPath.section)
+            TaskManager.shared.deleteCompletedTask(task: taskToDelete) // 불필요한 'inSection' 인수 제거
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
+
+
+
 }
 

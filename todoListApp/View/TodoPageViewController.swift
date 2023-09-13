@@ -1,10 +1,9 @@
 import UIKit
+import CoreData
 
 class TodoPageViewController: UIViewController {
     
-    // tasks를 2차원 배열로 변경. 첫 번째 배열은 오전, 두 번째 배열은 오후입니다.
-    var tasks = [[String](), [String]()]
-    
+    var tasks = [[Todo](), [Todo]()]
     
     @IBOutlet weak var todoTableView: UITableView!
     
@@ -14,7 +13,6 @@ class TodoPageViewController: UIViewController {
         todoTableView.dataSource = self
         todoTableView.delegate = self
         
-        // 네비게이션 버튼
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped))
         
         // TaskManager에서 task 배열 로드
@@ -65,10 +63,10 @@ class TodoPageViewController: UIViewController {
         
         present(alertController, animated: true, completion: nil)
     }
-
+    
     func saveTask(task: String, inSection section: Int) {
-        TaskManager.shared.saveTask(task: task, inSection: section)
-        self.tasks[section].append(task)
+        TaskManager.shared.saveTask(taskTitle: task, isCompleted: false, categoryName: section == 0 ? "오전" : "오후")
+        self.tasks = TaskManager.shared.loadTasks()
         todoTableView.reloadData()
     }
 }
@@ -90,7 +88,7 @@ extension TodoPageViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! TodoCell
-        cell.cellLabel.text = tasks[indexPath.section][indexPath.row]
+        cell.cellLabel.text = tasks[indexPath.section][indexPath.row].title
         cell.indexPath = indexPath
         cell.delegate = self
         return cell
@@ -106,7 +104,7 @@ extension TodoPageViewController: UITableViewDelegate {
         
         alertController.addTextField { (textField) in
             textField.placeholder = "해야 할 일이 변경 되었나요?"
-            textField.text = self.tasks[indexPath.section][indexPath.row]
+            textField.text = self.tasks[indexPath.section][indexPath.row].title
         }
         
         // 시간 선택을 위한 세그먼트 컨트롤 추가
@@ -125,15 +123,15 @@ extension TodoPageViewController: UITableViewDelegate {
         let saveAction = UIAlertAction(title: "저장", style: .default) { [unowned alertController] _ in
             if let textField = alertController.textFields?.first, let text = textField.text, !text.isEmpty {
                 let section = timeSelector.selectedSegmentIndex // 선택된 세그먼트 인덱스
-                TaskManager.shared.modifyTask(at: indexPath.row, inSection: section, newTask: text)
+                TaskManager.shared.modifyTask(at: indexPath, newTaskTitle: text, isCompleted: false)
                 
                 if section == indexPath.section {
                     // 섹션이 변경되지 않았다면
-                    self.tasks[indexPath.section][indexPath.row] = text
+                    self.tasks[indexPath.section][indexPath.row].title = text
                 } else {
                     // 섹션이 변경되었다면
                     self.tasks[indexPath.section].remove(at: indexPath.row)
-                    self.tasks[section].append(text)
+                    self.tasks[section].append(self.tasks[indexPath.section][indexPath.row]) // 수정: Todo 인스턴스 추가
                 }
                 
                 tableView.reloadData()
@@ -155,7 +153,7 @@ extension TodoPageViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            TaskManager.shared.deleteTask(at: indexPath.row, inSection: indexPath.section)
+            TaskManager.shared.deleteTask(task: tasks[indexPath.section][indexPath.row])
             tasks[indexPath.section].remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
@@ -169,14 +167,14 @@ extension TodoPageViewController: CellDelegate {
             return
         }
         
-        let completedTask = tasks[indexPath.section][indexPath.row]
-        TaskManager.shared.saveCompletedTask(task: completedTask, inSection: indexPath.section)
+        if let completedTask = tasks[indexPath.section][indexPath.row].title {
+            TaskManager.shared.modifyTask(at: indexPath, newTaskTitle: completedTask, isCompleted: true)
+        }
         
-        TaskManager.shared.deleteTask(at: indexPath.row, inSection: indexPath.section)
-        tasks[indexPath.section].remove(at: indexPath.row)
+        TaskManager.shared.deleteTask(task: tasks[indexPath.section][indexPath.row])
+        self.tasks[indexPath.section].remove(at: indexPath.row)
         
         todoTableView.deleteRows(at: [indexPath], with: .fade)
         todoTableView.reloadData()
     }
 }
-
