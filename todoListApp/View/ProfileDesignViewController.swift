@@ -8,8 +8,52 @@
 import Foundation
 import UIKit
 import SnapKit
+import PhotosUI
+import CoreData
 
-class ProfileDesignViewController: UIViewController {
+class ProfileDesignViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, PHPickerViewControllerDelegate {
+    
+    var selectedImages: [UIImage] = []
+    
+    
+    func presentImagePicker() {
+        var configuration = PHPickerConfiguration()
+        configuration.selectionLimit = 0  // 0은 제한 없음을 의미합니다.
+        configuration.filter = .images
+        
+        let imagePicker = PHPickerViewController(configuration: configuration)
+        imagePicker.delegate = self
+        self.present(imagePicker, animated: true, completion: nil)
+    }
+    
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true, completion: nil)
+        
+        for result in results {
+            result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
+                if let image = object as? UIImage {
+                    DispatchQueue.main.async {
+                        self.selectedImages.append(image)
+                        self.saveImage(image: image) // 이미지를 Core Data에 저장
+                        self.collectionView.reloadData()
+                    }
+                }
+            }
+        }
+    }
+
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            selectedImages.append(selectedImage)
+            collectionView.reloadData()
+        }
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
+    private var collectionView: UICollectionView!
+    
+    
     
     private let backButton: UIImageView = {
         let imageView = UIImageView()
@@ -208,6 +252,48 @@ class ProfileDesignViewController: UIViewController {
         return button
     }()
     
+    lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "Model") // 여기에 실제 모델 이름을 사용하세요.
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        return container
+    }()
+    
+    func saveImage(image: UIImage) {
+        let context = persistentContainer.viewContext
+        let entity = NSEntityDescription.entity(forEntityName: "Image", in: context)! // 여기에 실제 엔터티 이름을 사용하세요.
+        let newImage = NSManagedObject(entity: entity, insertInto: context)
+        
+        newImage.setValue(image.pngData(), forKey: "image") // 여기에 실제 이미지 속성 이름을 사용하세요.
+        
+        do {
+            try context.save()
+        } catch {
+            print("Failed saving")
+        }
+    }
+    
+    func loadImages() -> [UIImage]? {
+        let context = persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Image") // 여기에 실제 엔터티 이름을 사용하세요.
+        
+        do {
+            let imageObjects = try context.fetch(fetchRequest)
+            return imageObjects.compactMap { obj in
+                if let imageData = obj.value(forKey: "image") as? Data { // 여기에 실제 이미지 속성 이름을 사용하세요.
+                    return UIImage(data: imageData)
+                }
+                return nil
+            }
+        } catch {
+            print("Failed loading")
+            return nil
+        }
+    }
+    
     private func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
         let screenWidth = UIScreen.main.bounds.width
@@ -222,8 +308,8 @@ class ProfileDesignViewController: UIViewController {
         layout.minimumLineSpacing = padding
         layout.minimumInteritemSpacing = padding
         
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = UIColor(red: 1, green: 0, blue: 0, alpha: 0.2)
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0)
         
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -294,6 +380,14 @@ class ProfileDesignViewController: UIViewController {
         
         menuButton.addTarget(self, action: #selector(menuButtonTapped), for: .touchUpInside)
         
+        gridButton.addTarget(self, action: #selector(gridButtonTapped), for: .touchUpInside)
+        
+        //        presentImagePicker()
+        
+        if let loadedImages = loadImages() {
+               self.selectedImages = loadedImages
+               collectionView.reloadData()
+           }
         
     }
     
@@ -436,7 +530,9 @@ class ProfileDesignViewController: UIViewController {
         profilePageVC.modalPresentationStyle = .fullScreen // 전체 화면으로 보이게 설정
         self.present(profilePageVC, animated: true, completion: nil)
     }
-
+    @objc private func gridButtonTapped() {
+        presentImagePicker()
+    }
     
     
 }
@@ -445,13 +541,20 @@ class ProfileDesignViewController: UIViewController {
 
 extension ProfileDesignViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 20
+        return selectedImages.count
     }
+    
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
-        cell.backgroundColor = .blue
+        if indexPath.row < selectedImages.count {
+            cell.contentView.layer.contents = selectedImages[indexPath.row].cgImage
+        } else {
+            cell.backgroundColor = .blue
+        }
         return cell
     }
+    
 }
+
 
