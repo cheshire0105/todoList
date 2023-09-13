@@ -1,10 +1,9 @@
 import UIKit
+import CoreData
 
 class TodoPageViewController: UIViewController {
     
-    // tasks를 2차원 배열로 변경. 첫 번째 배열은 오전, 두 번째 배열은 오후입니다.
-    var tasks = [[String](), [String]()]
-    
+    private var viewModel = TodoPageViewModel()
     
     @IBOutlet weak var todoTableView: UITableView!
     
@@ -14,28 +13,29 @@ class TodoPageViewController: UIViewController {
         todoTableView.dataSource = self
         todoTableView.delegate = self
         
-        // 네비게이션 버튼
+        // 오른쪽 상단에 할 일 추가 버튼 추가
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped))
         
-        // TaskManager에서 task 배열 로드
-        tasks = TaskManager.shared.loadTasks()
-        
-        // 테이블 뷰를 리로드하여 로드된 task를 반영
+        // 뷰가 로드될 때 데이터 로드 및 초기화
+        viewModel.loadAndUpdateTasks()
         todoTableView.reloadData()
+        
+        // 노티피케이션 옵저버 추가
+                NotificationCenter.default.addObserver(self, selector: #selector(switchToggled(notification:)), name: .switchToggled, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        // TaskManager에서 task 배열을 로드합니다.
-        tasks = TaskManager.shared.loadTasks()
-        
-        // 테이블 뷰를 리로드하여 로드된 task를 반영합니다.
+        // 뷰가 나타날 때마다 데이터 다시 로드
+        viewModel.loadAndUpdateTasks()
         todoTableView.reloadData()
+        
+        
     }
     
     @objc func addButtonTapped() {
-        let alertController = UIAlertController(title: "할 일 목록", message: "기억 해야 할 일이 있나요?\n\n", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "할 일 목록", message: "기억해야 할 일이 있나요?\n\n", preferredStyle: .alert)
         alertController.addTextField { (textField) in
             textField.placeholder = "여기에 할 일을 적어주세요"
         }
@@ -55,21 +55,16 @@ class TodoPageViewController: UIViewController {
         let saveAction = UIAlertAction(title: "저장", style: .default) { [unowned alertController] _ in
             if let textField = alertController.textFields?.first, let text = textField.text, !text.isEmpty {
                 let section = timeSelector.selectedSegmentIndex // 0은 오전, 1은 오후
-                self.saveTask(task: text, inSection: section)
+                self.viewModel.saveTask(task: text, inSection: section)
+                self.todoTableView.reloadData()
             }
         }
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         
         alertController.addAction(saveAction)
         alertController.addAction(cancelAction)
         
         present(alertController, animated: true, completion: nil)
-    }
-
-    func saveTask(task: String, inSection section: Int) {
-        TaskManager.shared.saveTask(task: task, inSection: section)
-        self.tasks[section].append(task)
-        todoTableView.reloadData()
     }
 }
 
@@ -85,14 +80,13 @@ extension TodoPageViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tasks[section].count
+        return viewModel.tasks[section].count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! TodoCell
-        cell.cellLabel.text = tasks[indexPath.section][indexPath.row]
+        cell.cellLabel.text = viewModel.tasks[indexPath.section][indexPath.row].title
         cell.indexPath = indexPath
-        cell.delegate = self
         return cell
     }
 }
@@ -106,7 +100,7 @@ extension TodoPageViewController: UITableViewDelegate {
         
         alertController.addTextField { (textField) in
             textField.placeholder = "해야 할 일이 변경 되었나요?"
-            textField.text = self.tasks[indexPath.section][indexPath.row]
+            textField.text = self.viewModel.tasks[indexPath.section][indexPath.row].title
         }
         
         // 시간 선택을 위한 세그먼트 컨트롤 추가
@@ -125,23 +119,13 @@ extension TodoPageViewController: UITableViewDelegate {
         let saveAction = UIAlertAction(title: "저장", style: .default) { [unowned alertController] _ in
             if let textField = alertController.textFields?.first, let text = textField.text, !text.isEmpty {
                 let section = timeSelector.selectedSegmentIndex // 선택된 세그먼트 인덱스
-                TaskManager.shared.modifyTask(at: indexPath.row, inSection: section, newTask: text)
-                
-                if section == indexPath.section {
-                    // 섹션이 변경되지 않았다면
-                    self.tasks[indexPath.section][indexPath.row] = text
-                } else {
-                    // 섹션이 변경되었다면
-                    self.tasks[indexPath.section].remove(at: indexPath.row)
-                    self.tasks[section].append(text)
-                }
-                
+                self.viewModel.modifyTask(at: indexPath, with: text, inSection: section)
                 tableView.reloadData()
             }
         }
         
         // 취소 버튼
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         
         alertController.addAction(saveAction)
         alertController.addAction(cancelAction)
@@ -152,31 +136,24 @@ extension TodoPageViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
     }
 
-    
+    // 셀 스와이프로 삭제
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            TaskManager.shared.deleteTask(at: indexPath.row, inSection: indexPath.section)
-            tasks[indexPath.section].remove(at: indexPath.row)
+            viewModel.deleteTask(at: indexPath)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
 }
 
 // MARK: - CellDelegate
-extension TodoPageViewController: CellDelegate {
-    func switchToggled(on cell: TodoCell) {
-        guard let indexPath = cell.indexPath else {
-            return
-        }
-        
-        let completedTask = tasks[indexPath.section][indexPath.row]
-        TaskManager.shared.saveCompletedTask(task: completedTask, inSection: indexPath.section)
-        
-        TaskManager.shared.deleteTask(at: indexPath.row, inSection: indexPath.section)
-        tasks[indexPath.section].remove(at: indexPath.row)
-        
-        todoTableView.deleteRows(at: [indexPath], with: .fade)
-        todoTableView.reloadData()
-    }
+extension TodoPageViewController {
+    @objc func switchToggled(notification: Notification) {
+           if let cell = notification.userInfo?["cell"] as? TodoCell, let indexPath = cell.indexPath {
+               viewModel.completeTask(at: indexPath)
+               
+               DispatchQueue.main.async {
+                   self.todoTableView.reloadData()
+               }
+           }
+       }
 }
-
