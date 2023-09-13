@@ -17,6 +17,7 @@ class ProfileDesignViewController: UIViewController {
     
     var profileViewModel = ProfileViewModel()
 
+
     
     func presentImagePicker() {
         var configuration = PHPickerConfiguration()
@@ -29,7 +30,6 @@ class ProfileDesignViewController: UIViewController {
     }
     
     private var collectionView: UICollectionView!
-    
     
     private let backButton: UIImageView = {
         let imageView = UIImageView()
@@ -64,7 +64,6 @@ class ProfileDesignViewController: UIViewController {
         }
         return button
     }()
-    
     
     private let userPicView: UIImageView = {
         let imageView = UIImageView()
@@ -202,8 +201,10 @@ class ProfileDesignViewController: UIViewController {
     }()
     
     private let line: UIView = {
+        let screenWidth = UIScreen.main.bounds.width
+
         let view = UIView()
-        view.frame = CGRect(x: 0, y: 0, width: 375, height: 2)
+        view.frame = CGRect(x: 0, y: 0, width: screenWidth, height: 2)
         
         let stroke = UIView()
         stroke.bounds = view.bounds.insetBy(dx: -0.25, dy: -0.25)
@@ -229,7 +230,7 @@ class ProfileDesignViewController: UIViewController {
     }()
     
     lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "Model") // 여기에 실제 모델 이름을 사용하세요.
+        let container = NSPersistentContainer(name: "Model") 
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
@@ -421,10 +422,10 @@ class ProfileDesignViewController: UIViewController {
         
         line.snp.makeConstraints { make in
             make.height.equalTo(2)
-            make.width.equalToSuperview()
             make.top.equalTo(moreButton.snp.bottom).offset(10)
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
         }
-        
         
         gridButton.snp.makeConstraints { make in
             make.width.equalTo(22.5)
