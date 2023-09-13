@@ -11,14 +11,16 @@ import SnapKit
 import PhotosUI
 import CoreData
 
-class ProfileDesignViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, PHPickerViewControllerDelegate {
+class ProfileDesignViewController: UIViewController {
     
     var selectedImages: [UIImage] = []
     
+    var profileViewModel = ProfileViewModel()
+
     
     func presentImagePicker() {
         var configuration = PHPickerConfiguration()
-        configuration.selectionLimit = 0  // 0은 제한 없음을 의미합니다.
+        configuration.selectionLimit = 0
         configuration.filter = .images
         
         let imagePicker = PHPickerViewController(configuration: configuration)
@@ -26,33 +28,7 @@ class ProfileDesignViewController: UIViewController, UIImagePickerControllerDele
         self.present(imagePicker, animated: true, completion: nil)
     }
     
-    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        picker.dismiss(animated: true, completion: nil)
-        
-        for result in results {
-            result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
-                if let image = object as? UIImage {
-                    DispatchQueue.main.async {
-                        self.selectedImages.append(image)
-                        self.saveImage(image: image) // 이미지를 Core Data에 저장
-                        self.collectionView.reloadData()
-                    }
-                }
-            }
-        }
-    }
-    
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            selectedImages.append(selectedImage)
-            collectionView.reloadData()
-        }
-        picker.dismiss(animated: true, completion: nil)
-    }
-    
     private var collectionView: UICollectionView!
-    
     
     
     private let backButton: UIImageView = {
@@ -262,37 +238,6 @@ class ProfileDesignViewController: UIViewController, UIImagePickerControllerDele
         return container
     }()
     
-    func saveImage(image: UIImage) {
-        let context = persistentContainer.viewContext
-        let entity = NSEntityDescription.entity(forEntityName: "Image", in: context)! // 여기에 실제 엔터티 이름을 사용하세요.
-        let newImage = NSManagedObject(entity: entity, insertInto: context)
-        
-        newImage.setValue(image.pngData(), forKey: "image") // 여기에 실제 이미지 속성 이름을 사용하세요.
-        
-        do {
-            try context.save()
-        } catch {
-            print("Failed saving")
-        }
-    }
-    
-    func loadImages() -> [UIImage]? {
-        let context = persistentContainer.viewContext
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Image") // 여기에 실제 엔터티 이름을 사용하세요.
-        
-        do {
-            let imageObjects = try context.fetch(fetchRequest)
-            return imageObjects.compactMap { obj in
-                if let imageData = obj.value(forKey: "image") as? Data { // 여기에 실제 이미지 속성 이름을 사용하세요.
-                    return UIImage(data: imageData)
-                }
-                return nil
-            }
-        } catch {
-            print("Failed loading")
-            return nil
-        }
-    }
     
     private func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
@@ -330,66 +275,34 @@ class ProfileDesignViewController: UIViewController, UIImagePickerControllerDele
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
         
-        view.addSubview(backButton)
-        
-        view.addSubview(customLabel)
-        
-        view.addSubview(menuButton)
-        
-        view.addSubview(userPicView)
-        
-        view.addSubview(postsNum)
-        
-        view.addSubview(postsLabel)
-        
-        view.addSubview(followersNum)
-        
-        view.addSubview(followers)
-        
-        view.addSubview(followingsNum)
-        
-        view.addSubview(followings)
-        
-        view.addSubview(userInfoName)
-        
-        view.addSubview(userInfoNickName)
-        
-        view.addSubview(userInfoWeb)
-        
-        view.addSubview(blueButton)
-        
-        view.addSubview(whiteButton)
-        
-        view.addSubview(moreButton)
-        
-        view.addSubview(line)
-        
-        view.addSubview(gridButton)
-        
-        
-        
-        
-        setupLayout()
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(goBack))
-        backButton.addGestureRecognizer(tapGesture)
-        
+        setupView()
         setupCollectionView()
-        
-        menuButton.addTarget(self, action: #selector(menuButtonTapped), for: .touchUpInside)
+        setupGestureRecognizers()
+        loadInitialData()
         
         gridButton.addTarget(self, action: #selector(gridButtonTapped), for: .touchUpInside)
-        
-        //        presentImagePicker()
-        
-        if let loadedImages = loadImages() {
-            self.selectedImages = loadedImages
-            collectionView.reloadData()
-        }
-        
     }
+    
+    private func setupView() {
+        view.backgroundColor = .white
+        
+        view.addSubviews([backButton, customLabel, menuButton, userPicView, postsNum, postsLabel, followersNum, followers, followingsNum, followings, userInfoName, userInfoNickName, userInfoWeb, blueButton, whiteButton, moreButton, line, gridButton])
+        
+        setupLayout()
+    }
+    
+    private func setupGestureRecognizers() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(goBack))
+        backButton.addGestureRecognizer(tapGesture)
+    }
+    
+    func loadInitialData() {
+            if let loadedImages = profileViewModel.loadImages() {
+                self.selectedImages = loadedImages
+                collectionView.reloadData()
+            }
+        }
     
     private func setupLayout() {
         backButton.snp.remakeConstraints { make in
@@ -525,11 +438,6 @@ class ProfileDesignViewController: UIViewController, UIImagePickerControllerDele
         self.dismiss(animated: true, completion: nil)
     }
     
-    @objc private func menuButtonTapped() {
-        let profilePageVC = ProfilePageViewController()
-        profilePageVC.modalPresentationStyle = .fullScreen // 전체 화면으로 보이게 설정
-        self.present(profilePageVC, animated: true, completion: nil)
-    }
     @objc private func gridButtonTapped() {
         presentImagePicker()
     }
@@ -537,8 +445,45 @@ class ProfileDesignViewController: UIViewController, UIImagePickerControllerDele
     
 }
 
+extension UIView {
+    func addSubviews(_ views: [UIView]) {
+        for view in views {
+            addSubview(view)
+        }
+    }
+}
 
+// PHPickerViewControllerDelegate 프로토콜 메서드
+extension ProfileDesignViewController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+          picker.dismiss(animated: true, completion: nil)
+          
+          for result in results {
+              result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
+                  if let image = object as? UIImage {
+                      DispatchQueue.main.async {
+                          self.profileViewModel.selectedImages.append(image) // 인스턴스를 사용하여 속성에 접근
+                          self.profileViewModel.saveImage(image: image)  // 인스턴스를 사용하여 메서드 호출
+                          self.collectionView.reloadData()
+                      }
+                  }
+              }
+          }
+      }
+}
 
+// UIImagePickerControllerDelegate 프로토콜 메서드
+extension ProfileDesignViewController: UIImagePickerControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            selectedImages.append(selectedImage)
+            collectionView.reloadData()
+        }
+        picker.dismiss(animated: true, completion: nil)
+    }
+}
+
+// UICollectionView 프로토콜 메서드
 extension ProfileDesignViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return selectedImages.count

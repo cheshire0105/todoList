@@ -142,10 +142,10 @@
             </objects>
             <point key="canvasLocation" x="-718.32061068702285" y="-66.197183098591552"/>
         </scene>
-        <!--Done Page-->
+        <!--Done Page View Controller-->
         <scene sceneID="DUw-1v-V4a">
             <objects>
-                <viewController id="6r6-zI-qf9" customClass="DonePage" customModule="todoListApp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="6r6-zI-qf9" customClass="DonePageViewController" customModule="todoListApp" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="p2I-Hh-hr3">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

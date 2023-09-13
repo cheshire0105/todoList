@@ -15,16 +15,16 @@
 		FF23F6A12A7943C300D65879 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF23F69F2A7943C300D65879 /* LaunchScreen.storyboard */; };
 		FF23F6A92A794AB000D65879 /* TodoPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF23F6A82A794AB000D65879 /* TodoPageViewController.swift */; };
 		FF23F6AB2A794BFE00D65879 /* TodoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF23F6AA2A794BFE00D65879 /* TodoCell.swift */; };
-		FF23F6AD2A79597800D65879 /* DonePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF23F6AC2A79597800D65879 /* DonePage.swift */; };
+		FF23F6AD2A79597800D65879 /* DonePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF23F6AC2A79597800D65879 /* DonePageViewController.swift */; };
 		FF23F6AF2A795BFA00D65879 /* DoneCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF23F6AE2A795BFA00D65879 /* DoneCell.swift */; };
 		FF3CD44C2A9C2D140028A568 /* TaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF3CD44B2A9C2D140028A568 /* TaskManager.swift */; };
 		FF6BD7E02AB0A3AF0046502E /* ProfileDesignViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6BD7DF2AB0A3AF0046502E /* ProfileDesignViewController.swift */; };
 		FF6BD7E32AB0A3CC0046502E /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = FF6BD7E22AB0A3CC0046502E /* SnapKit */; };
-		FF6BD7E52AB0A4530046502E /* ProfilePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6BD7E42AB0A4530046502E /* ProfilePageViewController.swift */; };
-		FF6BD7E92AB0A84D0046502E /* ProfilePageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6BD7E62AB0A84C0046502E /* ProfilePageViewModel.swift */; };
 		FF6BD7EA2AB0A84D0046502E /* ProfileDesignViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6BD7E72AB0A84D0046502E /* ProfileDesignViewModel.swift */; };
-		FF6BD7EB2AB0A84D0046502E /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6BD7E82AB0A84D0046502E /* ViewModel.swift */; };
 		FF6BD8002AB1603D0046502E /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FF6BD7FE2AB1603D0046502E /* Model.xcdatamodeld */; };
+		FF6BD8262AB1CB8D0046502E /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6BD8252AB1CB8D0046502E /* MainViewModel.swift */; };
+		FF6BD8282AB1CDB60046502E /* TodoPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6BD8272AB1CDB60046502E /* TodoPageViewModel.swift */; };
+		FF6BD82A2AB1CFAA0046502E /* DoneViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6BD8292AB1CFAA0046502E /* DoneViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,15 +38,15 @@
 		FF23F6A22A7943C300D65879 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FF23F6A82A794AB000D65879 /* TodoPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoPageViewController.swift; sourceTree = "<group>"; };
 		FF23F6AA2A794BFE00D65879 /* TodoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoCell.swift; sourceTree = "<group>"; };
-		FF23F6AC2A79597800D65879 /* DonePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonePage.swift; sourceTree = "<group>"; };
+		FF23F6AC2A79597800D65879 /* DonePageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonePageViewController.swift; sourceTree = "<group>"; };
 		FF23F6AE2A795BFA00D65879 /* DoneCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoneCell.swift; sourceTree = "<group>"; };
 		FF3CD44B2A9C2D140028A568 /* TaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskManager.swift; sourceTree = "<group>"; };
 		FF6BD7DF2AB0A3AF0046502E /* ProfileDesignViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileDesignViewController.swift; sourceTree = "<group>"; };
-		FF6BD7E42AB0A4530046502E /* ProfilePageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePageViewController.swift; sourceTree = "<group>"; };
-		FF6BD7E62AB0A84C0046502E /* ProfilePageViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfilePageViewModel.swift; sourceTree = "<group>"; };
 		FF6BD7E72AB0A84D0046502E /* ProfileDesignViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileDesignViewModel.swift; sourceTree = "<group>"; };
-		FF6BD7E82AB0A84D0046502E /* ViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		FF6BD7FF2AB1603D0046502E /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		FF6BD8252AB1CB8D0046502E /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
+		FF6BD8272AB1CDB60046502E /* TodoPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoPageViewModel.swift; sourceTree = "<group>"; };
+		FF6BD8292AB1CFAA0046502E /* DoneViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoneViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,9 +82,9 @@
 			children = (
 				FF23F6962A7943C100D65879 /* SceneDelegate.swift */,
 				FF23F6942A7943C100D65879 /* AppDelegate.swift */,
+				FFB3828F2A7A1D5D006B93EC /* View */,
 				FF6BD7DC2AB0A3400046502E /* ViewModel */,
 				FF3CD44A2A9C2CFD0028A568 /* Model */,
-				FFB3828F2A7A1D5D006B93EC /* View */,
 				FF23F69A2A7943C100D65879 /* Main.storyboard */,
 				FF23F69D2A7943C300D65879 /* Assets.xcassets */,
 				FF23F69F2A7943C300D65879 /* LaunchScreen.storyboard */,
@@ -105,9 +105,10 @@
 		FF6BD7DC2AB0A3400046502E /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				FF6BD8252AB1CB8D0046502E /* MainViewModel.swift */,
+				FF6BD8272AB1CDB60046502E /* TodoPageViewModel.swift */,
+				FF6BD8292AB1CFAA0046502E /* DoneViewModel.swift */,
 				FF6BD7E72AB0A84D0046502E /* ProfileDesignViewModel.swift */,
-				FF6BD7E62AB0A84C0046502E /* ProfilePageViewModel.swift */,
-				FF6BD7E82AB0A84D0046502E /* ViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -124,11 +125,10 @@
 		FFB3828F2A7A1D5D006B93EC /* View */ = {
 			isa = PBXGroup;
 			children = (
-				FF23F6A82A794AB000D65879 /* TodoPageViewController.swift */,
-				FF23F6AC2A79597800D65879 /* DonePage.swift */,
 				FF23F6982A7943C100D65879 /* MainViewController.swift */,
+				FF23F6A82A794AB000D65879 /* TodoPageViewController.swift */,
+				FF23F6AC2A79597800D65879 /* DonePageViewController.swift */,
 				FF6BD7DF2AB0A3AF0046502E /* ProfileDesignViewController.swift */,
-				FF6BD7E42AB0A4530046502E /* ProfilePageViewController.swift */,
 				FFB3828E2A7A1D32006B93EC /* Cell */,
 			);
 			path = View;
@@ -213,18 +213,18 @@
 			files = (
 				FF23F6992A7943C100D65879 /* MainViewController.swift in Sources */,
 				FF23F6A92A794AB000D65879 /* TodoPageViewController.swift in Sources */,
-				FF23F6AD2A79597800D65879 /* DonePage.swift in Sources */,
+				FF23F6AD2A79597800D65879 /* DonePageViewController.swift in Sources */,
+				FF6BD8262AB1CB8D0046502E /* MainViewModel.swift in Sources */,
 				FF6BD8002AB1603D0046502E /* Model.xcdatamodeld in Sources */,
 				FF23F6AF2A795BFA00D65879 /* DoneCell.swift in Sources */,
-				FF6BD7E92AB0A84D0046502E /* ProfilePageViewModel.swift in Sources */,
 				FF23F6AB2A794BFE00D65879 /* TodoCell.swift in Sources */,
-				FF6BD7EB2AB0A84D0046502E /* ViewModel.swift in Sources */,
-				FF6BD7E52AB0A4530046502E /* ProfilePageViewController.swift in Sources */,
 				FF23F6952A7943C100D65879 /* AppDelegate.swift in Sources */,
 				FF23F6972A7943C100D65879 /* SceneDelegate.swift in Sources */,
 				FF3CD44C2A9C2D140028A568 /* TaskManager.swift in Sources */,
 				FF6BD7EA2AB0A84D0046502E /* ProfileDesignViewModel.swift in Sources */,
 				FF6BD7E02AB0A3AF0046502E /* ProfileDesignViewController.swift in Sources */,
+				FF6BD82A2AB1CFAA0046502E /* DoneViewModel.swift in Sources */,
+				FF6BD8282AB1CDB60046502E /* TodoPageViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
