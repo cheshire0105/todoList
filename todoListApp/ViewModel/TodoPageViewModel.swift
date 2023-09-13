@@ -17,17 +17,22 @@ class TodoPageViewModel {
     
     // 할 일 수정 메서드
     func modifyTask(at indexPath: IndexPath, with text: String, inSection section: Int) {
-        TaskManager.shared.modifyTask(at: indexPath, newTaskTitle: text, isCompleted: false)
+        let taskToMove = self.tasks[indexPath.section][indexPath.row]
         
         if section == indexPath.section {
             // 섹션이 변경되지 않았다면
-            self.tasks[indexPath.section][indexPath.row].title = text
+            taskToMove.title = text
         } else {
             // 섹션이 변경되었다면
             self.tasks[indexPath.section].remove(at: indexPath.row)
-            self.tasks[section].append(self.tasks[indexPath.section][indexPath.row]) // 수정: Todo 인스턴스 추가
+            self.tasks[section].append(taskToMove) // 수정: Todo 인스턴스 추가
+            
+            // CoreData에서 카테고리 변경
+            TaskManager.shared.modifyTaskCategory(task: taskToMove, newCategoryName: section == 0 ? "오전" : "오후")
         }
     }
+
+
     
     // 할 일 삭제 메서드
     func deleteTask(at indexPath: IndexPath) {

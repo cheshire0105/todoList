@@ -34,6 +34,11 @@ class TaskManager {
         todo.title = taskTitle
         todo.isCompleted = isCompleted
         
+        let category = Category(context: context)
+        category.name = categoryName
+        todo.category = category
+        
+        saveContext()
     }
     
     // 할 일 목록 불러오기 함수
@@ -59,11 +64,22 @@ class TaskManager {
     // 할 일 수정 함수
     func modifyTask(at indexPath: IndexPath, newTaskTitle: String, isCompleted: Bool) {
         let tasks = loadTasks()
+        
+        guard indexPath.section < tasks.count,
+              indexPath.row < tasks[indexPath.section].count else {
+            print("인덱스 범위 초과 오류")
+            return
+        }
+        
         let task = tasks[indexPath.section][indexPath.row]
         task.title = newTaskTitle
         task.isCompleted = isCompleted
         saveContext()
     }
+  
+
+
+
     
     // 할 일 삭제 함수
     func deleteTask(task: Todo) {
@@ -113,4 +129,13 @@ class TaskManager {
         context.delete(task)
         saveContext()
     }
+    
+    // 카테고리 수정 함수
+    func modifyTaskCategory(task: Todo, newCategoryName: String) {
+        let category = Category(context: context)
+        category.name = newCategoryName
+        task.category = category
+        saveContext()
+    }
+
 }

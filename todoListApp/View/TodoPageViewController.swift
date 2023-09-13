@@ -19,6 +19,9 @@ class TodoPageViewController: UIViewController {
         // 뷰가 로드될 때 데이터 로드 및 초기화
         viewModel.loadAndUpdateTasks()
         todoTableView.reloadData()
+        
+        // 노티피케이션 옵저버 추가
+                NotificationCenter.default.addObserver(self, selector: #selector(switchToggled(notification:)), name: .switchToggled, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -27,6 +30,8 @@ class TodoPageViewController: UIViewController {
         // 뷰가 나타날 때마다 데이터 다시 로드
         viewModel.loadAndUpdateTasks()
         todoTableView.reloadData()
+        
+        
     }
     
     @objc func addButtonTapped() {
@@ -82,7 +87,6 @@ extension TodoPageViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! TodoCell
         cell.cellLabel.text = viewModel.tasks[indexPath.section][indexPath.row].title
         cell.indexPath = indexPath
-        cell.delegate = self
         return cell
     }
 }
@@ -142,18 +146,14 @@ extension TodoPageViewController: UITableViewDelegate {
 }
 
 // MARK: - CellDelegate
-extension TodoPageViewController: CellDelegate {
-    func switchToggled(on cell: TodoCell) {
-        guard let indexPath = cell.indexPath else {
-            return
-        }
-        
-        // 작업을 완료 상태로 변경
-        viewModel.completeTask(at: indexPath)
-        
-        // 테이블 뷰 업데이트를 메인 스레드에서 비동기로 수행
-        DispatchQueue.main.async {
-            self.todoTableView.reloadData()
-        }
-    }
+extension TodoPageViewController {
+    @objc func switchToggled(notification: Notification) {
+           if let cell = notification.userInfo?["cell"] as? TodoCell, let indexPath = cell.indexPath {
+               viewModel.completeTask(at: indexPath)
+               
+               DispatchQueue.main.async {
+                   self.todoTableView.reloadData()
+               }
+           }
+       }
 }
