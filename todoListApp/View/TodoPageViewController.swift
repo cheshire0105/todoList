@@ -153,7 +153,6 @@ extension TodoPageViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
     }
 
-    
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             TaskManager.shared.deleteTask(task: tasks[indexPath.section][indexPath.row])
@@ -163,7 +162,6 @@ extension TodoPageViewController: UITableViewDelegate {
     }
 }
 
-// MARK: - CellDelegate
 // MARK: - CellDelegate
 extension TodoPageViewController: CellDelegate {
     func switchToggled(on cell: TodoCell) {

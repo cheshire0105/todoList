@@ -55,11 +55,12 @@ extension DonePage: UITableViewDelegate {
             let taskToRevert = self.completedTasks[indexPath.section][indexPath.row]
             self.completedTasks[indexPath.section].remove(at: indexPath.row)
             
-            // 이 부분을 수정하여 task 인자를 제대로 전달하도록 합니다.
-            TaskManager.shared.saveTask(taskTitle: taskToRevert.title!, isCompleted: false, categoryName: indexPath.section == 0 ? "오전" : "오후")
+            // saveTask 대신 revertTaskToTodoList 호출
+            TaskManager.shared.revertTaskToTodoList(task: taskToRevert)
             
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
+
 
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)

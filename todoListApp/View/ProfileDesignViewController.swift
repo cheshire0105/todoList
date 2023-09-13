@@ -41,7 +41,7 @@ class ProfileDesignViewController: UIViewController, UIImagePickerControllerDele
             }
         }
     }
-
+    
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
@@ -385,9 +385,9 @@ class ProfileDesignViewController: UIViewController, UIImagePickerControllerDele
         //        presentImagePicker()
         
         if let loadedImages = loadImages() {
-               self.selectedImages = loadedImages
-               collectionView.reloadData()
-           }
+            self.selectedImages = loadedImages
+            collectionView.reloadData()
+        }
         
     }
     
