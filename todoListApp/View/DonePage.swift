@@ -9,16 +9,16 @@ class DonePage: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // TaskManager에서 completedTasks 배열을 로드합니다.
-        completedTasks = TaskManager.shared.loadCompletedTasks()
-        
-        // doneTableView의 dataSource와 delegate를 설정합니다.
-        doneTableView.dataSource = self
-        doneTableView.delegate = self
-        
-        // doneTableView를 리로드하여 로드된 작업 목록을 표시합니다.
-        doneTableView.reloadData()
+          
+          // TaskManager에서 completedTasks 배열을 로드합니다.
+          completedTasks = TaskManager.shared.loadCompletedTasks()
+          
+          // doneTableView의 dataSource와 delegate를 설정합니다.
+          doneTableView.dataSource = self
+          doneTableView.delegate = self
+          
+          // doneTableView를 리로드하여 로드된 작업 목록을 표시합니다.
+          doneTableView.reloadData()
     }
 }
 
@@ -72,7 +72,6 @@ extension DonePage: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    // 밀어서 삭제
     // 밀어서 삭제
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {

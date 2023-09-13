@@ -61,8 +61,10 @@ class TaskManager {
         do {
             let allTasks = try context.fetch(fetchRequest)
             for task in allTasks {
-                if let section = task.category?.name == "오전" ? 0 : 1 {
-                    tasks[section].append(task)
+                if !task.isCompleted { // Only load tasks that are not completed
+                    if let section = task.category?.name == "오전" ? 0 : 1 {
+                        tasks[section].append(task)
+                    }
                 }
             }
         } catch {
@@ -71,6 +73,7 @@ class TaskManager {
         
         return tasks
     }
+
     
     // Update
     func modifyTask(at indexPath: IndexPath, newTaskTitle: String, isCompleted: Bool) {

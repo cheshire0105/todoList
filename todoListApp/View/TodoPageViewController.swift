@@ -15,20 +15,23 @@ class TodoPageViewController: UIViewController {
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped))
         
-        // TaskManager에서 task 배열 로드
-        tasks = TaskManager.shared.loadTasks()
-        
-        // 테이블 뷰를 리로드하여 로드된 task를 반영
-        todoTableView.reloadData()
+        // viewDidLoad에서 데이터를 로드하고 초기화
+        loadAndUpdateTasks()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        // TaskManager에서 task 배열을 로드합니다.
+        // viewWillAppear에서 데이터를 다시 로드
+        loadAndUpdateTasks()
+    }
+    
+    // 데이터를 로드하고 tasks 배열을 초기화한 후 테이블 뷰 리로드
+    private func loadAndUpdateTasks() {
+        // TaskManager에서 task 배열 로드
         tasks = TaskManager.shared.loadTasks()
         
-        // 테이블 뷰를 리로드하여 로드된 task를 반영합니다.
+        // 테이블 뷰를 리로드하여 로드된 task를 반영
         todoTableView.reloadData()
     }
     
@@ -161,20 +164,32 @@ extension TodoPageViewController: UITableViewDelegate {
 }
 
 // MARK: - CellDelegate
+// MARK: - CellDelegate
 extension TodoPageViewController: CellDelegate {
     func switchToggled(on cell: TodoCell) {
         guard let indexPath = cell.indexPath else {
             return
         }
         
-        if let completedTask = tasks[indexPath.section][indexPath.row].title {
-            TaskManager.shared.modifyTask(at: indexPath, newTaskTitle: completedTask, isCompleted: true)
+        // 작업을 완료 상태로 변경
+        if let taskTitle = tasks[indexPath.section][indexPath.row].title {
+            TaskManager.shared.modifyTask(at: indexPath, newTaskTitle: taskTitle, isCompleted: true)
         }
+
         
-        TaskManager.shared.deleteTask(task: tasks[indexPath.section][indexPath.row])
-        self.tasks[indexPath.section].remove(at: indexPath.row)
-        
+        tasks[indexPath.section].remove(at: indexPath.row)
         todoTableView.deleteRows(at: [indexPath], with: .fade)
-        todoTableView.reloadData()
+
+        
+        // 변경 내용을 Core Data에 저장
+        TaskManager.shared.saveContext()
+        
+        // 테이블 뷰 업데이트를 메인 스레드에서 비동기로 수행
+        DispatchQueue.main.async {
+            self.todoTableView.reloadData()
+        }
     }
 }
+
+
+
