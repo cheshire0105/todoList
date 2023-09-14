@@ -21,7 +21,7 @@ class TodoPageViewController: UIViewController {
         todoTableView.reloadData()
         
         // 노티피케이션 옵저버 추가
-                NotificationCenter.default.addObserver(self, selector: #selector(switchToggled(notification:)), name: .switchToggled, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(switchToggled(notification:)), name: .switchToggled, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -135,7 +135,7 @@ extension TodoPageViewController: UITableViewDelegate {
         // 셀 선택 해제
         tableView.deselectRow(at: indexPath, animated: true)
     }
-
+    
     // 셀 스와이프로 삭제
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
@@ -148,12 +148,12 @@ extension TodoPageViewController: UITableViewDelegate {
 // MARK: - CellDelegate
 extension TodoPageViewController {
     @objc func switchToggled(notification: Notification) {
-           if let cell = notification.userInfo?["cell"] as? TodoCell, let indexPath = cell.indexPath {
-               viewModel.completeTask(at: indexPath)
-               
-               DispatchQueue.main.async {
-                   self.todoTableView.reloadData()
-               }
-           }
-       }
+        if let cell = notification.userInfo?["cell"] as? TodoCell, let indexPath = cell.indexPath {
+            viewModel.completeTask(at: indexPath)
+            
+            DispatchQueue.main.async {
+                self.todoTableView.reloadData()
+            }
+        }
+    }
 }

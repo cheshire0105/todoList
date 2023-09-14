@@ -54,4 +54,27 @@ class ProfileViewModel {
             return nil
         }
     }
+    
+    func deleteImage(at index: Int) {
+        let context = persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Image")
+
+        do {
+            let imageObjects = try context.fetch(fetchRequest)
+            if index < imageObjects.count {
+                let imageToDelete = imageObjects[index]
+                context.delete(imageToDelete)
+                
+                try context.save()
+                
+                // 햅틱 피드백 발생
+                let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
+                feedbackGenerator.prepare()
+                feedbackGenerator.impactOccurred()
+            }
+        } catch {
+            print("Failed deleting")
+        }
+    }
+
 }

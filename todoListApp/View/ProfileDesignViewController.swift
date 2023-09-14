@@ -299,11 +299,14 @@ class ProfileDesignViewController: UIViewController {
     }
     
     func loadInitialData() {
-            if let loadedImages = profileViewModel.loadImages() {
-                self.selectedImages = loadedImages
-                collectionView.reloadData()
+        if let loadedImages = profileViewModel.loadImages() {
+            self.selectedImages = loadedImages
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
             }
         }
+    }
+
     
     private func setupLayout() {
         backButton.snp.remakeConstraints { make in
@@ -457,21 +460,21 @@ extension UIView {
 // PHPickerViewControllerDelegate 프로토콜 메서드
 extension ProfileDesignViewController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-          picker.dismiss(animated: true, completion: nil)
-          
-          for result in results {
-              result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
-                  if let image = object as? UIImage {
-                      DispatchQueue.main.async {
-                          self.profileViewModel.selectedImages.append(image) // 인스턴스를 사용하여 속성에 접근
-                          self.profileViewModel.saveImage(image: image)  // 인스턴스를 사용하여 메서드 호출
-                          self.collectionView.reloadData()
-                      }
-                  }
-              }
-          }
-      }
+        picker.dismiss(animated: true, completion: nil)
+        
+        for result in results {
+            result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
+                if let image = object as? UIImage {
+                    DispatchQueue.main.async {
+                        self.profileViewModel.saveImage(image: image)
+                        self.loadInitialData()
+                    }
+                }
+            }
+        }
+    }
 }
+
 
 // UIImagePickerControllerDelegate 프로토콜 메서드
 extension ProfileDesignViewController: UIImagePickerControllerDelegate {
@@ -500,6 +503,18 @@ extension ProfileDesignViewController: UICollectionViewDelegate, UICollectionVie
         }
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let alert = UIAlertController(title: "Delete Image", message: "Are you sure you want to delete this image?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+            self.profileViewModel.deleteImage(at: indexPath.row)
+            self.selectedImages.remove(at: indexPath.row)
+            collectionView.deleteItems(at: [indexPath])
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+
     
 }
 
