@@ -505,15 +505,20 @@ extension ProfileDesignViewController: UICollectionViewDelegate, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let alert = UIAlertController(title: "Delete Image", message: "Are you sure you want to delete this image?", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.prepare()
+        generator.impactOccurred()
+        
+        let alert = UIAlertController(title: "이미지 삭제", message: "선택된 이미지를 삭제 하시겠습니까?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "삭제", style: .destructive, handler: { _ in
             self.profileViewModel.deleteImage(at: indexPath.row)
             self.selectedImages.remove(at: indexPath.row)
             collectionView.deleteItems(at: [indexPath])
         }))
         self.present(alert, animated: true, completion: nil)
     }
+
 
     
 }
