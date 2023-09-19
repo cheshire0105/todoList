@@ -85,10 +85,12 @@ extension TodoPageViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! TodoCell
-        cell.cellLabel.text = viewModel.tasks[indexPath.section][indexPath.row].title
+        let todo = viewModel.tasks[indexPath.section][indexPath.row]
+        cell.configure(with: todo)
         cell.indexPath = indexPath
         return cell
     }
+
 }
 
 // MARK: - UITableViewDelegate
@@ -150,10 +152,12 @@ extension TodoPageViewController {
     @objc func switchToggled(notification: Notification) {
         if let cell = notification.userInfo?["cell"] as? TodoCell, let indexPath = cell.indexPath {
             viewModel.completeTask(at: indexPath)
-            
+
             DispatchQueue.main.async {
-                self.todoTableView.reloadData()
+                self.todoTableView.deleteRows(at: [indexPath], with: .fade)
             }
         }
     }
+
+
 }

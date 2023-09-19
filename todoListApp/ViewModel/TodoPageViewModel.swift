@@ -42,10 +42,19 @@ class TodoPageViewModel {
     
     // 할 일 완료 상태 변경 메서드
     func completeTask(at indexPath: IndexPath) {
-        if let taskTitle = tasks[indexPath.section][indexPath.row].title {
-            TaskManager.shared.modifyTask(at: indexPath, newTaskTitle: taskTitle, isCompleted: true)
+        var taskToToggle = tasks[indexPath.section][indexPath.row]
+        taskToToggle.isCompleted.toggle()
+
+        // CoreData에 변경 사항 저장
+        if let taskTitle = taskToToggle.title {
+            TaskManager.shared.modifyTask(at: indexPath, newTaskTitle: taskTitle, isCompleted: taskToToggle.isCompleted)
         }
+
+        // 할 일 목록에서 삭제
         tasks[indexPath.section].remove(at: indexPath.row)
         TaskManager.shared.saveContext()
     }
+
+
+
 }

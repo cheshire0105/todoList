@@ -274,6 +274,7 @@
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="cellLabel" destination="c1r-IQ-y98" id="Hfd-eu-XWg"/>
+                                            <outlet property="switchControl" destination="aLs-fh-3mu" id="2Do-WL-67k"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
